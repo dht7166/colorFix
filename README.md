@@ -16,11 +16,19 @@ An U-net. I downsample the original image (256,256) to (16,16) and upscale it (d
 I believe the original U-net used Crop and Concat, but I used add because I like it. No padding as it would create strange color striped border in my experience.
 For loss function, I used SSIM (or D-SSIM: (1-SSIM)/2) with a L1 loss.
 
+Training:
+Simply edit training.py and call python training.py
+
+Prediction:
+I did not add the file for prediction here, will add later.
 
 Result:
 I have just trained for about 10 epoches. The picture looks like it is becoming better. I will update the final result when available.
 Many improvement could be done with the Generator, for example using Sub-pixel convolution instead of normal upscaling, better loss function and training scheme.
 Any suggestions and help is appreciated, as I am just starting. Feel free to do PR.
+
+A demo of my result is in the images folder. Ground truth images are the original one, I simulated them (SIMULATED) and then feed it to the GAN.
+The prediction looks like a blurry version of the original, but at least the color looks right. The problem right now is probably with the generator.
 
 Plans:
 I plan to finish my final exam before this. Any help would be appreciated.
