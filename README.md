@@ -4,8 +4,8 @@ Using GAN to fix color in images. Implemented in Keras.
 Project was made during free time on Thanksgiving. I had not much experience in ML.
 
 Given an image, we can adjust the brightness and contrast by simply using the equation: Image = Image * alpha + beta (pixel-wise operation)
-Then, reconstruct the initial image using Image = Image *(1/alpha) - beta/alpha. Of course, since Image are limited from 0 to 255, certain feature would be lost.
-In this project, I attempt to fix the lost using GAN.
+Of course, since Image are limited from 0 to 255, certain feature would be lost.
+In this project, I attempt to fix the lost using GAN. So, basically given an image with wrong color using the alpha/beta transform, GAN will fix it.
 
 Discriminator:
 I simply downsampling images, with a final FCN with sigmoid to check if the image got "good" coloring or not.
