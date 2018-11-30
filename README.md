@@ -30,9 +30,7 @@ Any suggestions and help is appreciated, as I am just starting. Feel free to do 
 A demo of my result is in the images folder. Ground truth images are the original one, I simulated them (SIMULATED) and then feed it to the GAN.
 The prediction looks like a blurry version of the original, but at least the color looks right. The problem right now is probably with the generator.
 
-Ground_truth : ![alt text](https://github.com/dht7166/colorFix/blob/master/images/GT_gre46.jpg)
-Simulated: ![alt text](https://github.com/dht7166/colorFix/blob/master/images/simulated_gre46.jpg)
-Prediction, not quite good yet, but getting there: ![alt text](https://github.com/dht7166/colorFix/blob/master/images/Pred_gre46.jpg)
+
 
 Plans:
 I plan to finish my final exam before this. Any help would be appreciated.
