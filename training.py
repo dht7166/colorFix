@@ -17,7 +17,7 @@ class Monitor(Callback):
 
 
 batchsize= 8
-steps = int(1600/batchsize)
+steps = int(2800/batchsize)
 # Create the model
 model = SharpGan()
 model.D.summary()
@@ -25,7 +25,7 @@ model.G.summary()
 model.GAN.summary()
 # Try to load old weights
 print("LOADING OLD WEIGHTS")
-model.GAN.load_weights('SSIM_loss/Generator_1.h5')
+model.GAN.load_weights('change_model/GAN_trained_2.h5')
 print('*************************************')
 
 
@@ -43,8 +43,8 @@ stop_train_threshold = 0.01
 
 def train(nb_epoch):
     # Model Checkpoint
-    ckpt_gan = ModelCheckpoint('SSIM_loss/GAN_2.h5',monitor='loss',save_best_only=False)
-    ckpt_g = ModelCheckpoint('SSIM_loss/Generator_2.h5',monitor = 'out_generator_loss',save_best_only=False)
+    ckpt_gan = ModelCheckpoint('change_model/GAN_3.h5',monitor='loss',save_best_only=False)
+    ckpt_g = ModelCheckpoint('change_model/Generator_3.h5',monitor = 'out_generator_loss',save_best_only=False)
 
     check_stop_early = {'discriminator':1.0,
                         'gan':1.0,
@@ -89,7 +89,7 @@ def train(nb_epoch):
                                 validation_data=train_GAN.get_validation(20),
                                 callbacks=[ckpt_g,ckpt_gan,monitor_GAN],
                                 max_queue_size=5)
+        model.GAN.save('change_model/GAN_trained_3.h5')
 
-    model.GAN.save('GAN_trained_2.h5')
 
-train(7)
+train(20)

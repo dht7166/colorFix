@@ -12,8 +12,8 @@ I simply downsampling images, with a final FCN with sigmoid to check if the imag
 A simple MSE loss function.
 
 Generator:
-An U-net. I downsample the original image (256,256) to (16,16) and upscale it (default upscale2d in keras), then add the layers together.
-I believe the original U-net used Crop and Concat, but I used add because I like it. No padding as it would create strange color striped border in my experience.
+An U-net. I downsample the original image (256,256) to (16,16) and upscale it (default upscale2d in keras), then concat the layers together.
+No padding as it would create strange color striped border in my experience.
 For loss function, I used SSIM (or D-SSIM: (1-SSIM)/2) with a L1 loss.
 
 Training:
@@ -36,4 +36,8 @@ Prediction, not quite good yet, but getting there: ![alt text](https://github.co
 
 Plans:
 I plan to finish my final exam before this. Any help would be appreciated.
+
+Update:
+Changed the model from adding in U net to Concat. I think that how they did it originally, and it seems to have got better result.
+Updates result are in images folder.
 

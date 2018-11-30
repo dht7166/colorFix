@@ -24,8 +24,8 @@ class Train_Discriminator(Sequence):
         x_batch = []
         y_batch = []
         for i in range(size):
-            _, img = os.path.split(self.image_list[i])
-            fake_image = (np.random.random()) > 0.5
+            _, img = os.path.split(self.image_list[-i-1])
+            fake_image = (i%2) == 0
             if not fake_image:
                 y_batch.append(1)
                 x_batch.append(read_image(os.path.join(self.gt_folder, img),226) / 255.0)
@@ -39,7 +39,7 @@ class Train_Discriminator(Sequence):
         return np.asarray(x_batch), np.asarray(y_batch).reshape((size, 1, 1, 1))
 
     def on_epoch_end(self):
-        shuffle(self.image_list)
+        pass
 
     def __len__(self):
         return self.length
@@ -50,7 +50,7 @@ class Train_Discriminator(Sequence):
 
         for i in range(idx*self.batch,(idx+1)*self.batch):
             _,img = os.path.split(self.image_list[i])
-            fake_image = (np.random.random())>0.5
+            fake_image = (i%2)==0
             if not fake_image:
                 y_batch.append(1)
                 x_batch.append(read_image(os.path.join(self.gt_folder,img),226)/255.0)
@@ -76,7 +76,7 @@ class Train_GAN(Sequence):
         self.length = int(len(self.image_list) / batch_size)
 
     def on_epoch_end(self):
-        shuffle(self.image_list)
+        pass
 
 
     def __len__(self):
@@ -99,7 +99,7 @@ class Train_GAN(Sequence):
         y_batch = []
         y_image_batch = []
         for i in range(size):
-            _,img = os.path.split(self.image_list[i])
+            _,img = os.path.split(self.image_list[-i-1])
             x_batch.append(read_image(os.path.join(self.pred_folder,img),256)/255.0)
             y_image_batch.append(read_image(os.path.join(self.gt_folder,img),226)/255.0)
             y_batch.append(1)
