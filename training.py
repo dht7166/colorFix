@@ -20,13 +20,13 @@ batchsize= 8
 steps = int(2800/batchsize)
 # Create the model
 model = SharpGan()
-model.D.summary()
-model.G.summary()
-model.GAN.summary()
+# model.D.summary()
+# model.G.summary()
+# model.GAN.summary()
 # Try to load old weights
-print("LOADING OLD WEIGHTS")
-model.GAN.load_weights('change_model/GAN_trained_2.h5')
-print('*************************************')
+# print("LOADING OLD WEIGHTS")
+# model.GAN.load_weights('change_model/GAN_trained_5.h5')
+# print('*************************************')
 
 
 train_D = Train_Discriminator(model.G,'ground_truth','simulated',batchsize)
@@ -38,18 +38,20 @@ monitor_D = Monitor('Discriminator_train_double.txt')
 monitor_GAN = Monitor('Gan_train_double.txt')
 
 # Threshold for training
-threshold = 4.0
+threshold = 2.0
 stop_train_threshold = 0.01
 
 def train(nb_epoch):
     # Model Checkpoint
-    ckpt_gan = ModelCheckpoint('change_model/GAN_3.h5',monitor='loss',save_best_only=False)
-    ckpt_g = ModelCheckpoint('change_model/Generator_3.h5',monitor = 'out_generator_loss',save_best_only=False)
+    ckpt_gan = ModelCheckpoint('change_model/GAN_1.h5',monitor='loss',save_best_only=False)
+    ckpt_g = ModelCheckpoint('change_model/Generator_1.h5',monitor = 'out_generator_loss',save_best_only=False)
 
     check_stop_early = {'discriminator':1.0,
                         'gan':1.0,
                         'generator':1.0,
                         'count':4}
+    epoch_D = 1
+    epoch_G = 1
     for i in range(nb_epoch):
         print('TRAINING EPOCH ' + str(i + 1)+'/'+str(nb_epoch))
         # Determine Training state using loss threshold
@@ -67,29 +69,34 @@ def train(nb_epoch):
         #     print("STOPPING EARLY")
         #     break
 
-        if (d_loss<stop_train_threshold and d_loss*threshold<gan_loss):
-            global stop_train_threshold
+        if (d_loss*threshold<gan_loss):
+            epoch_G = epoch_G + 1
             print("Discriminator too strong, not training this time")
-            stop_train_threshold = stop_train_threshold/2
+
         else:
+            epoch_G = 1
             # Pre-train the Discriminator
             print("Train the Discriminator")
             model.D.fit_generator(generator=train_D,
                                   steps_per_epoch=steps,
-                                  epochs= 1,
+                                  epochs= epoch_D,
                                   validation_data=train_D.get_validation(20),
                                   callbacks=[monitor_D],
                                   max_queue_size=5)
-
-        # Train the Generator through GAN
-        print("train the Generator/GAN")
-        model.GAN.fit_generator(generator=train_GAN,
-                                steps_per_epoch=steps,
-                                epochs=4 if (gan_loss>threshold*d_loss) else 2,
-                                validation_data=train_GAN.get_validation(20),
-                                callbacks=[ckpt_g,ckpt_gan,monitor_GAN],
-                                max_queue_size=5)
-        model.GAN.save('change_model/GAN_trained_3.h5')
+        if (gan_loss<d_loss):
+            print("GAN is OK, no train")
+            epoch_D = epoch_D + 2
+        else:
+            epoch_D = 1
+            # Train the Generator through GAN
+            print("train the Generator/GAN")
+            model.GAN.fit_generator(generator=train_GAN,
+                                    steps_per_epoch=steps,
+                                    epochs=epoch_G,
+                                    validation_data=train_GAN.get_validation(20),
+                                    callbacks=[ckpt_g,ckpt_gan,monitor_GAN],
+                                    max_queue_size=5)
+        model.GAN.save('change_model/GAN_trained_1.h5')
 
 
 train(20)

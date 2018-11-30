@@ -39,7 +39,7 @@ class Train_Discriminator(Sequence):
         return np.asarray(x_batch), np.asarray(y_batch).reshape((size, 1, 1, 1))
 
     def on_epoch_end(self):
-        pass
+        shuffle(self.image_list)
 
     def __len__(self):
         return self.length
@@ -47,15 +47,16 @@ class Train_Discriminator(Sequence):
     def __getitem__(self, idx):
         x_batch = []
         y_batch = []
-
+        fake_image = False
+        if idx>=175:
+            fake_image = True
         for i in range(idx*self.batch,(idx+1)*self.batch):
             _,img = os.path.split(self.image_list[i])
-            fake_image = (i%2)==0
             if not fake_image:
-                y_batch.append(1)
+                y_batch.append(1.0)
                 x_batch.append(read_image(os.path.join(self.gt_folder,img),226)/255.0)
             else:
-                y_batch.append(0)
+                y_batch.append(0.0)
                 image = read_image(os.path.join(self.pred_folder, img),256)/255.0
                 image = np.expand_dims(image,axis = 0)
                 image = self.G.predict(image)

@@ -45,21 +45,16 @@ class SharpGan():
         input = Input(shape=(226,226,C))
         # Layer 1 to 4 are all conv with downsampling
         x = input
-        for i in range(1,5):
-            x = Conv2D(32,kernel_size=(3,3),strides=(1,1),padding='same',use_bias=False,
+        for i in range(1,7):
+            filter = 16*(2**i)
+            if filter>512:
+                filter = 512
+            x = Conv2D(filters=filter,kernel_size=(3,3),strides=(1,1),padding='valid',use_bias=False,
                        name = 'conv_'+str(i))(x)
-            x = LeakyReLU(alpha=0.1)(x)
+            x = LeakyReLU(alpha=0.3)(x)
             x = BatchNormalization()(x)
             x = MaxPool2D(pool_size=(2,2))(x)
 
-        for i in range(5,8):
-            x = Conv2D(64,kernel_size=(2,2),strides=(1,1),use_bias=False,
-                       padding='valid',name ='conv_'+str(i))(x)
-            x = LeakyReLU(alpha=0.1)(x)
-            x = BatchNormalization()(x)
-            if (i!=7):
-                x = MaxPool2D(pool_size=(2,2))(x)
-            x = Dense(64,activation='sigmoid')(x)
 
         output = Dense(1,activation='sigmoid',name='out_generator')(x)
 
@@ -69,7 +64,7 @@ class SharpGan():
     def generator(self):
         input = Input((W,H,C))
 
-        x = Conv2D(32,kernel_size=(3,3),padding='same',strides=(1,1),name=
+        x = Conv2D(64,kernel_size=(3,3),padding='same',strides=(1,1),name=
                    'initial_conv',use_bias=False)(input)
         x = LeakyReLU(alpha=0.1)(x)
         x = BatchNormalization()(x)
@@ -77,7 +72,7 @@ class SharpGan():
 
         for i in range(1,5):
             skip_connection.append(x)
-            x = Conv2D(int(32*(2**i)),kernel_size=(3,3),padding='same',strides=(1,1),
+            x = Conv2D(int(64*(2**i)),kernel_size=(3,3),padding='same',strides=(1,1),
                        name='conv_'+str(i),use_bias=False)(x)
             x = LeakyReLU(alpha=0.1)(x)
             x = BatchNormalization()(x)
@@ -96,10 +91,10 @@ class SharpGan():
         shape = 32
         a_shape = 32
         for i in range(7,11):
+            # Consider using Conv2dtranspose
             x = UpSampling2D(size=(2,2),name = 'upsample_'+str(i))(x)
             filters = int(512/(2**(i-6)))
-            if i == 10:
-                filters = 32
+
 
             cropped = Cropping2D(int((a_shape - shape) / 2))(skip_connection[6 - i])
             x = Concatenate(name='concat_data' + str(i))([x, cropped])
@@ -128,7 +123,7 @@ class SharpGan():
         output = self.D(self.G.output)
         self.GAN = Model(self.G.input,[self.G.output, output])
         self.GAN._make_predict_function()
-        GAN_optimizer = keras.optimizers.Adam(lr=1e-3)
+        GAN_optimizer = keras.optimizers.Adam(lr= 2*1e-3)
         self.GAN.compile(optimizer=GAN_optimizer, loss={
             'out_generator': self.loss_G,
             'discriminator': 'mean_squared_error'})
@@ -136,17 +131,17 @@ class SharpGan():
 
 
     def __init__(self):
-        self.l1_loss = 0.5 # Pumped up to possibly reduce noise
-        self.dssim_loss = 0.3
+        self.l1_loss = 0.8 # Pumped up to possibly reduce noise
+        self.dssim_loss = 0.2
 
         self.D = self.discriminator()
         self.D._make_predict_function()
-        D_optimizer = keras.optimizers.Adam(lr = 1e-6) #Hopefully helps when discriminator too strong
+        D_optimizer = keras.optimizers.Adam(lr = 2*1e-3) #Hopefully helps when discriminator too strong
         self.D.compile(optimizer=D_optimizer, loss='mean_squared_error')
 
         self.G = self.generator()
         self.G._make_predict_function()
-        G_optimizer = keras.optimizers.Adam(lr = 1e-3)
+        G_optimizer = keras.optimizers.Adam(lr = 2*1e-3)
         self.G.compile(optimizer=G_optimizer,loss = self.loss_G)
 
         self.GAN = self.create_GAN()

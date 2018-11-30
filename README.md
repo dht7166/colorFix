@@ -36,6 +36,7 @@ Plans:
 I plan to finish my final exam before this. Any help would be appreciated.
 
 Update:
-Changed the model from adding in U net to Concat. I think that how they did it originally, and it seems to have got better result.
+1. Changed the model from adding in U net to Concat. I think that how they did it originally, and it seems to have got better result.
 Updates result are in images folder.
 
+2. Change the model, both discriminator and generator to be more powerful. Trained for a few epoch and result looks good.
