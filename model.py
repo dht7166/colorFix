@@ -72,14 +72,15 @@ class SharpGan():
 
         for i in range(1,5):
             skip_connection.append(x)
-            x = Conv2D(int(64*(2**i)),kernel_size=(3,3),padding='same',strides=(1,1),
+            filter = int(64*(2**i))
+            x = Conv2D(filter,kernel_size=(3,3),padding='same',strides=(1,1),
                        name='conv_'+str(i),use_bias=False)(x)
             x = LeakyReLU(alpha=0.1)(x)
             x = BatchNormalization()(x)
             x = MaxPool2D(pool_size=(2,2))(x)
 
 
-        x = Conv2D(512,kernel_size=(1,1),strides=(1,1),use_bias=False,name = 'conv_5')(x)
+        x = Conv2D(1024,kernel_size=(1,1),strides=(1,1),use_bias=False,name = 'conv_5')(x)
         x = LeakyReLU(alpha=0.1)(x)
         x = BatchNormalization()(x)
 
@@ -131,8 +132,8 @@ class SharpGan():
 
 
     def __init__(self):
-        self.l1_loss = 0.8 # Pumped up to possibly reduce noise
-        self.dssim_loss = 0.2
+        self.l1_loss = 0.5 # Pumped up to possibly reduce noise
+        self.dssim_loss = 0.1
 
         self.D = self.discriminator()
         self.D._make_predict_function()

@@ -40,3 +40,5 @@ Update:
 Updates result are in images folder.
 
 2. Change the model, both discriminator and generator to be more powerful. Trained for a few epoch and result looks good.
+
+3. I believe there is currently a big problem. The generator does not seems to be training. I will investigate
