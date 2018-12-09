@@ -27,6 +27,8 @@ I have just trained for about 10 epoches. The picture looks like it is becoming 
 Many improvement could be done with the Generator, for example using Sub-pixel convolution instead of normal upscaling, better loss function and training scheme.
 Any suggestions and help is appreciated, as I am just starting. Feel free to do PR.
 
+Links to the trained weight (best so far, result based on validation sets)
+[https://drive.google.com/file/d/1ivI74FnlUYwfdA2fQzRrCkk2sc77f7BA/view?usp=sharing](https://drive.google.com/file/d/1ivI74FnlUYwfdA2fQzRrCkk2sc77f7BA/view?usp=sharing)
 
 ### Epoch 4
 ![a1](image/1/epoch_4/2.jpg) ![a1](image/1/epoch_4/15.jpg) ![a1](image/1/epoch_4/20.jpg) ![a1](image/1/epoch_4/17.jpg)
