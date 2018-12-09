@@ -6,7 +6,7 @@ import numpy as np
 from keras import backend as K
 from keras.activations import relu
 from keras.layers import Input,Conv2D,LeakyReLU,BatchNormalization,MaxPool2D,Dense
-from keras.layers import UpSampling2D,Add,Cropping2D,Concatenate
+from keras.layers import UpSampling2D,Add,Cropping2D,Concatenate,AveragePooling2D
 
 W,H,C = (256,256,3)
 
@@ -77,15 +77,18 @@ class SharpGan():
                        name='conv_'+str(i),use_bias=False)(x)
             x = LeakyReLU(alpha=0.1)(x)
             x = BatchNormalization()(x)
-            x = MaxPool2D(pool_size=(2,2))(x)
+            x = AveragePooling2D(pool_size=(2,2))(x)
 
+
+        skipping = x
 
         x = Conv2D(1024,kernel_size=(1,1),strides=(1,1),use_bias=False,name = 'conv_5')(x)
         x = LeakyReLU(alpha=0.1)(x)
         x = BatchNormalization()(x)
 
+        x = Concatenate()([skipping,x])
 
-        x = Conv2D(512,kernel_size=(1,1),strides=(1,1),use_bias=False,name = 'conv_6')(x)
+        x = Conv2D(1024,kernel_size=(1,1),strides=(1,1),use_bias=False,name = 'conv_6')(x)
         x = LeakyReLU(alpha=0.1)(x)
         x = BatchNormalization()(x)
 
@@ -95,14 +98,20 @@ class SharpGan():
             # Consider using Conv2dtranspose
             x = UpSampling2D(size=(2,2),name = 'upsample_'+str(i))(x)
             filters = int(512/(2**(i-6)))
-
+            after_concat = int(1024/(2**(i-6)))
 
             cropped = Cropping2D(int((a_shape - shape) / 2))(skip_connection[6 - i])
             x = Concatenate(name='concat_data' + str(i))([x, cropped])
-            x = Conv2D(filters= filters,kernel_size=(3,3),strides=(1,1),padding='valid',
+            x = Conv2D(filters= after_concat,kernel_size=(3,3),strides=(1,1),padding='valid',
                        use_bias=False,name = 'up_conv_'+str(i))(x)
             x = LeakyReLU(alpha=0.1)(x)
             x = BatchNormalization()(x)
+
+            if after_concat!=filters:
+                x = Conv2D(filters=filters,kernel_size=(1,1),name = 'padding_up_conv_'+str(i))(x)
+                x = LeakyReLU(alpha=0.3)(x)
+                x = BatchNormalization()(x)
+
 
             # Update shape
             shape =shape-2
@@ -110,9 +119,14 @@ class SharpGan():
             shape = shape-(shape%2)
             a_shape = a_shape * 2
 
-        x = Conv2D(3,kernel_size=(1,1))(x)
+        for i in range(11,13):
+            x = Conv2D(64,kernel_size=(1,1),name='final_out_conv_'+str(i))(x)
+            x = LeakyReLU(alpha=0.3)(x)
+            if i==12:
+                continue
+            x = BatchNormalization()(x)
 
-        x = Dense(3,activation='sigmoid',name='out_generator')(x)
+        x = Conv2D(3,kernel_size=(1,1),name='out_generator',activation='sigmoid')(x)
 
 
 
@@ -137,7 +151,7 @@ class SharpGan():
 
         self.D = self.discriminator()
         self.D._make_predict_function()
-        D_optimizer = keras.optimizers.Adam(lr = 2*1e-3) #Hopefully helps when discriminator too strong
+        D_optimizer = keras.optimizers.Adam(lr = 1e-3) #Hopefully helps when discriminator too strong
         self.D.compile(optimizer=D_optimizer, loss='mean_squared_error')
 
         self.G = self.generator()
@@ -147,3 +161,4 @@ class SharpGan():
 
         self.GAN = self.create_GAN()
 
+SharpGan().G.summary()
