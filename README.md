@@ -41,6 +41,12 @@ Any suggestions and help is appreciated, as I am just starting. Feel free to do 
 ![a1](image/1/epoch_20/2.jpg) ![a1](image/1/epoch_20/15.jpg)![a1](image/1/epoch_20/20.jpg) ![a1](image/1/epoch_20/17.jpg)
 
 
+### Epoch 26
+![a1](image/2/epoch_2/2.jpg) ![a1](image/2/epoch_6/15.jpg)![a1](image/2/epoch_6/20.jpg) ![a1](image/2/epoch_6/17.jpg)
+
+### Epoch 32 (Best so far, but there is some more training but the result worsen)
+![a1](image/2/epoch_12/2.jpg) ![a1](image/2/epoch_12/15.jpg)![a1](image/2/epoch_12/20.jpg) ![a1](image/2/epoch_12/17.jpg)
+
 ## Plans:
 I plan to finish my final exam before this. Any help would be appreciated.
 
