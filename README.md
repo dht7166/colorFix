@@ -29,16 +29,16 @@ Any suggestions and help is appreciated, as I am just starting. Feel free to do 
 
 
 ### Epoch 4
-![a1](image/1/epoch_4/2.jpg) ![a1](image/1/epoch_4/15.jpg)
+![a1](image/1/epoch_4/2.jpg) ![a1](image/1/epoch_4/15.jpg) ![a1](image/1/epoch_4/20.jpg) ![a1](image/1/epoch_4/17.jpg)
 
 ### Epoch 10
-![a1](image/1/epoch_10/2.jpg) ![a1](image/1/epoch_10/15.jpg)
+![a1](image/1/epoch_10/2.jpg) ![a1](image/1/epoch_10/15.jpg) ![a1](image/1/epoch_10/20.jpg) ![a1](image/1/epoch_10/17.jpg)
 
 ### Epoch 16
-![a1](image/1/epoch_16/2.jpg) ![a1](image/1/epoch_16/15.jpg)
+![a1](image/1/epoch_16/2.jpg) ![a1](image/1/epoch_16/15.jpg) ![a1](image/1/epoch_16/20.jpg) ![a1](image/1/epoch_16/17.jpg)
 
 ### Epoch 20
-![a1](image/1/epoch_20/2.jpg) ![a1](image/1/epoch_20/15.jpg)
+![a1](image/1/epoch_20/2.jpg) ![a1](image/1/epoch_20/15.jpg)![a1](image/1/epoch_20/20.jpg) ![a1](image/1/epoch_20/17.jpg)
 
 
 ## Plans:
