@@ -28,7 +28,17 @@ Many improvement could be done with the Generator, for example using Sub-pixel c
 Any suggestions and help is appreciated, as I am just starting. Feel free to do PR.
 
 
+### Epoch 4
+![a1](image/1/epoch_4/2.jpg) ![a1](image/1/epoch_4/15.jpg)
 
+### Epoch 10
+![a1](image/1/epoch_10/2.jpg) ![a1](image/1/epoch_10/15.jpg)
+
+### Epoch 16
+![a1](image/1/epoch_16/2.jpg) ![a1](image/1/epoch_16/15.jpg)
+
+### Epoch 20
+![a1](image/1/epoch_20/2.jpg) ![a1](image/1/epoch_20/15.jpg)
 
 
 ## Plans:
