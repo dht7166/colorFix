@@ -1,47 +1,36 @@
-import keras
-from keras import layers
-from keras import models
-from keras.models import Model
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras import models
+from tensorflow.keras.models import Model
 import numpy as np
-from keras import backend as K
-from keras.activations import relu
-from keras.layers import Input,Conv2D,LeakyReLU,BatchNormalization,MaxPool2D,Dense
-from keras.layers import UpSampling2D,Add,Cropping2D,Concatenate,AveragePooling2D
+from tensorflow.keras import backend as K
+import tensorflow as tf
+from tensorflow.keras.activations import relu
+from tensorflow.keras.layers import Input,Conv2D,LeakyReLU,BatchNormalization,MaxPool2D,Dense
+from tensorflow.keras.layers import UpSampling2D,Add,Cropping2D,Concatenate,AveragePooling2D
 
 W,H,C = (256,256,3)
 
 class SharpGan():
+    """Defines the SharpGAN model, including Generator, Discriminator, and combined GAN."""
 
-    """
-    Loss function for generator
-    """
-    def loss_G(self,y_true, y_pred):
+    def loss_G(self,y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
+        """Calculates the generator loss, combining L1 distance and DSSIM."""
         # L1 Error, I am not using MSE
         L1_distance = K.mean(K.abs(y_true-y_pred))
 
         # SSIM error, or D-SSIM = (1-SSIM)
-        # x = K.mean(y_pred,axis=0)
-        # y = K.mean(y_true,axis=0)
-        x = y_true
-        y = y_pred
-        ave_x = K.mean(x)
-        ave_y = K.mean(y)
-        var_x = K.var(x)
-        var_y = K.var(y)
-        covariance = K.mean(x*y) - ave_x*ave_y
-        c1 = 0.01**2
-        c2 = 0.03**2
-        ssim = (2*ave_y*ave_x+c1)*(2*covariance+c2)
-        ssim = ssim/((K.pow(ave_x,2)+K.pow(ave_y,2)+c1) * (var_x+var_y+c2))
-        dssim = 1 - ssim
+        dssim = 1 - tf.reduce_mean(tf.image.ssim(y_true, y_pred, max_val=1.0))
 
+        # TODO: Review SNR calculation logic and purpose.
         #Possibly add something here as well to penalize noise
         # SNR
         snr = K.sigmoid(K.var(y_pred-y_true)/K.var(y_true))
+        # Assuming SNR was not part of the original loss based on the return statement provided in the previous content
+        return self.l1_loss_weight* L1_distance + self.dssim_loss_weight*dssim
 
-        return self.l1_loss* L1_distance + self.dssim_loss*dssim
-
-    def discriminator(self):
+    def discriminator(self) -> tf.keras.Model:
+        """Defines and returns the Discriminator model."""
         input = Input(shape=(226,226,C))
         # Layer 1 to 4 are all conv with downsampling
         x = input
@@ -61,7 +50,8 @@ class SharpGan():
         return Model(input,output,name='discriminator')
 
 
-    def generator(self):
+    def generator(self) -> tf.keras.Model:
+        """Defines and returns the Generator model with U-Net like architecture."""
         input = Input((W,H,C))
 
         x = Conv2D(64,kernel_size=(3,3),padding='same',strides=(1,1),name=
@@ -133,32 +123,37 @@ class SharpGan():
         return Model(input,x,name='generator')
 
 
-    def create_GAN(self):
+    def create_GAN(self) -> tf.keras.Model:
+        """Creates and compiles the combined GAN model."""
         self.D.trainable = False
         output = self.D(self.G.output)
         self.GAN = Model(self.G.input,[self.G.output, output])
-        self.GAN._make_predict_function()
-        GAN_optimizer = keras.optimizers.Adam(lr= 2*1e-3)
+        GAN_optimizer = tensorflow.keras.optimizers.Adam(learning_rate=self.g_lr)
         self.GAN.compile(optimizer=GAN_optimizer, loss={
             'out_generator': self.loss_G,
             'discriminator': 'mean_squared_error'})
         return self.GAN
 
 
-    def __init__(self):
-        self.l1_loss = 0.5 # Pumped up to possibly reduce noise
-        self.dssim_loss = 0.1
+    def __init__(self, l1_loss_weight: float = 0.5, dssim_loss_weight: float = 0.1, d_lr: float = 1e-3, g_lr: float = 2e-3) -> None:
+        """Initializes the SharpGan model, its components (D, G, GAN), and compiles them."""
+        self.l1_loss_weight = l1_loss_weight
+        self.dssim_loss_weight = dssim_loss_weight
+        self.d_lr = d_lr
+        self.g_lr = g_lr
 
         self.D = self.discriminator()
-        self.D._make_predict_function()
-        D_optimizer = keras.optimizers.Adam(lr = 1e-3) #Hopefully helps when discriminator too strong
+        D_optimizer = tensorflow.keras.optimizers.Adam(learning_rate=self.d_lr) #Hopefully helps when discriminator too strong
         self.D.compile(optimizer=D_optimizer, loss='mean_squared_error')
 
         self.G = self.generator()
-        self.G._make_predict_function()
-        G_optimizer = keras.optimizers.Adam(lr = 2*1e-3)
+        G_optimizer = tensorflow.keras.optimizers.Adam(learning_rate=self.g_lr)
         self.G.compile(optimizer=G_optimizer,loss = self.loss_G)
 
         self.GAN = self.create_GAN()
 
-SharpGan().G.summary()
+if __name__ == "__main__":
+    gan_model = SharpGan()
+    gan_model.G.summary()
+    gan_model.D.summary()
+    gan_model.GAN.summary()
